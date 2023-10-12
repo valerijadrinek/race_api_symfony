@@ -4,6 +4,9 @@ namespace App\Repository;
 
 use App\Entity\RaceResult;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,14 +24,19 @@ class RaceResultRepository extends ServiceEntityRepository
         parent::__construct($registry, RaceResult::class);
     }
 
-    public function add(RaceResult $entity, bool $flush=false)
+    public function add(array $entityArray, bool $flush=false)
     {
+        /**  @var RaceResult $entity */
+        foreach($entityArray as $entity) {
         $this->getEntityManager()->persist($entity);
+        }
 
         if($flush) 
         {
             $this->getEntityManager()->flush();
         }
+
+       
     }
 
     public function remove(RaceResult $entity, bool $flush=false)
@@ -42,28 +50,30 @@ class RaceResultRepository extends ServiceEntityRepository
     }
 
 
+
+
 //    /**
 //     * @return RaceResult[] Returns an array of RaceResult objects
 //     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('r.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+   public function findByExampleField($value): array
+   {
+       return $this->createQueryBuilder('r')
+           ->andWhere('r.exampleField = :val')
+           ->setParameter('val', $value)
+           ->orderBy('r.id', 'ASC')
+           ->setMaxResults(10)
+           ->getQuery()
+           ->getResult()
+       ;
+   }
 
-//    public function findOneBySomeField($value): ?RaceResult
-//    {
-//        return $this->createQueryBuilder('r')
-//            ->andWhere('r.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+   public function findOneBySomeField($value): ?RaceResult
+   {
+       return $this->createQueryBuilder('r')
+           ->andWhere('r.exampleField = :val')
+           ->setParameter('val', $value)
+           ->getQuery()
+           ->getOneOrNullResult()
+       ;
+   }
 }

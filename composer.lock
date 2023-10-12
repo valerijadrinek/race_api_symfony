@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7c0d837afd231bcacd48aa0c2bb480ac",
+    "content-hash": "86835f816bc1dfa75cc334beadcea813",
     "packages": [
         {
             "name": "api-platform/core",
@@ -2071,6 +2071,49 @@
                 "source": "https://github.com/php-fig/log/tree/3.0.0"
             },
             "time": "2021-07-14T16:46:02+00:00"
+        },
+        {
+            "name": "rap2hpoutre/csv-to-associative-array",
+            "version": "v0.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rap2hpoutre/csv-to-associative-array.git",
+                "reference": "e8f44aeddfcff0e9bf0526d38b77e0014c40dcc1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rap2hpoutre/csv-to-associative-array/zipball/e8f44aeddfcff0e9bf0526d38b77e0014c40dcc1",
+                "reference": "e8f44aeddfcff0e9bf0526d38b77e0014c40dcc1",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/csv_to_associative_array.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Raphael",
+                    "email": "raphaelht@gmail.com",
+                    "homepage": "http://raph.site"
+                }
+            ],
+            "description": "CVS to associative array",
+            "homepage": "https://github.com/rap2hpoutre/csv-to-associative-array",
+            "keywords": [
+                "array",
+                "csv"
+            ],
+            "support": {
+                "issues": "https://github.com/rap2hpoutre/csv-to-associative-array/issues",
+                "source": "https://github.com/rap2hpoutre/csv-to-associative-array/tree/master"
+            },
+            "time": "2016-06-09T11:29:14+00:00"
         },
         {
             "name": "symfony/asset",

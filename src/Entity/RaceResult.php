@@ -39,6 +39,12 @@ class RaceResult
     #[ORM\JoinColumn(nullable: false)]
     private ?Race $race = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $overall_placement = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $age_category_placement = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -100,6 +106,30 @@ class RaceResult
     public function setRace(?Race $race): static
     {
         $this->race = $race;
+
+        return $this;
+    }
+
+    public function getOverallPlacement(): ?int
+    {
+        return $this->overall_placement;
+    }
+
+    public function setOverallPlacement(?int $overall_placement): static
+    {
+        $this->overall_placement = $overall_placement;
+
+        return $this;
+    }
+
+    public function getAgeCategoryPlacement(): ?int
+    {
+        return $this->age_category_placement;
+    }
+
+    public function setAgeCategoryPlacement(?int $age_category_placement): static
+    {
+        $this->age_category_placement = $age_category_placement;
 
         return $this;
     }
