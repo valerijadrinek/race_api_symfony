@@ -24,7 +24,7 @@ class RaceResult
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Assert\Choice(['medium', 'long'])]
+    #[Assert\Choice(['medium', 'long'], message:'Only medium or long distance is valid.')]
     private ?string $distance = null;
 
     #[ORM\Column(type: Types::TIME_MUTABLE)]
@@ -34,6 +34,10 @@ class RaceResult
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     private ?string $ageCategory = null;
+
+    #[ORM\ManyToOne(inversedBy: 'racers')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Race $race = null;
 
     public function getId(): ?int
     {
@@ -84,6 +88,18 @@ class RaceResult
     public function setAgeCategory(string $ageCategory): static
     {
         $this->ageCategory = $ageCategory;
+
+        return $this;
+    }
+
+    public function getRace(): ?Race
+    {
+        return $this->race;
+    }
+
+    public function setRace(?Race $race): static
+    {
+        $this->race = $race;
 
         return $this;
     }

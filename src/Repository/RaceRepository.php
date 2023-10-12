@@ -21,6 +21,28 @@ class RaceRepository extends ServiceEntityRepository
         parent::__construct($registry, Race::class);
     }
 
+
+    public function add(Race $entity, bool $flush=false)
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if($flush) 
+        {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(Race $entity, bool $flush=false)
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if($flush) 
+        {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+
 //    /**
 //     * @return Race[] Returns an array of Race objects
 //     */
