@@ -27,9 +27,9 @@ class RaceResult
     #[Assert\Choice(['medium', 'long'], message:'Only medium or long distance is valid.')]
     private ?string $distance = null;
 
-    #[ORM\Column(type: Types::TIME_MUTABLE)]
+    #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    private ?\DateTimeInterface $time = null;
+    private ?int $time = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
@@ -74,12 +74,12 @@ class RaceResult
         return $this;
     }
 
-    public function getTime(): ?\DateTimeInterface
+    public function getTime(): ?int
     {
         return $this->time;
     }
 
-    public function setTime(\DateTimeInterface $time): static
+    public function setTime(int $time): static
     {
         $this->time = $time;
 
@@ -112,15 +112,22 @@ class RaceResult
 
     public function getOverallPlacement(): ?int
     {
-        return $this->overall_placement;
+        return $this->overall_placement;   
     }
 
     public function setOverallPlacement(?int $overall_placement): static
     {
-        $this->overall_placement = $overall_placement;
+        if($this->distance === 'medium')
+        {
+            $this->overall_placement = null;
+        } 
 
-        return $this;
-    }
+        $this->overall_placement = $overall_placement;
+        return $this;    
+            
+        
+        }
+        
 
     public function getAgeCategoryPlacement(): ?int
     {
@@ -129,6 +136,10 @@ class RaceResult
 
     public function setAgeCategoryPlacement(?int $age_category_placement): static
     {
+         if($this->distance === 'medium') {
+             $this->age_category_placement = null;
+         }
+        
         $this->age_category_placement = $age_category_placement;
 
         return $this;

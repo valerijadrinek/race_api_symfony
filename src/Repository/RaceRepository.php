@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Race;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<Race>
@@ -42,6 +43,59 @@ class RaceRepository extends ServiceEntityRepository
         }
     }
 
+    public function getAllRaces():array
+    {
+        return $this->findAllQuery(
+            withRacers:true,
+            withAverageLong:true,
+            withAverageMedium:true
+        )
+        ->orderBy('r.id', 'DESC')
+        ->getQuery()->getResult(); 
+    }
+
+    public function getOneRace(int | Race $race) : array
+    {
+        return $this->findAllQuery(
+            withRacers:true,
+            withAverageLong:true,
+            withAverageMedium:true
+        )->where('r.id = :id')
+        ->setParameter('id', $race instanceof Race ? $race->getId() : $race)
+        ->getQuery()->getResult();
+    }
+    
+
+    private function findAllQuery(
+        bool $withRacers=false,
+        bool $withAverageLong=false,
+        bool $withAverageMedium=false
+       
+    ) : QueryBuilder 
+    {
+        $query = $this->createQueryBuilder('r');
+
+        if($withRacers) {
+            $query->leftJoin('r.race_result', 'c')
+                  ->addSelect('c');
+        }  
+        
+        if($withAverageLong) {
+            $query->addSelect('avg(c.time) as avgLongTime')
+            ->from('r', 'c')
+            ->having('c.distance = long');
+        }
+
+        if($withAverageMedium) {
+            $query->addSelect('avg(c.time) as avgMediumTime')
+            ->from('r', 'c')
+            ->having('c.distance = medium');
+            
+        }
+
+      return $query;
+
+    }
 
 //    /**
 //     * @return Race[] Returns an array of Race objects
