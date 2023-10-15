@@ -3,42 +3,47 @@
 namespace App\Controller;
 
 use App\Entity\Race;
+use App\Entity\RaceResult;
 use App\Service\RaceService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-#[Route('/race', name: 'app_race_')]
+
+#[Route('/endpoint', name: 'app_race_')]
 class RaceController extends AbstractController
 {
 
-    #[Route('/', name: 'index')] 
+    #[Route('/', name: 'index', methods: ['GET', 'HEAD'])] 
     public function index(RaceService $service): JsonResponse
     {
-        $raceCollection = $service->getAllRace() ;
-        return $this->render('race/index.html.twig', [
-            'raceCollection' => $raceCollection,
-        ]);
+
+        $raceCollection = $service->getAllRace();
+        return $this->json($raceCollection);
+        
     }
 
-    #[Route('/{race}', name: 'one')] 
+    #[Route('/{race}', name: 'one', methods: ['GET', 'HEAD'])] 
     public function resultsByRace(Race $race, RaceService $service) : JsonResponse
     {
     
         $oneRace = $service->getOneRace($race);
+        $jsonResponse = new JsonResponse();
+        $jsonOneRace = $jsonResponse->setData($oneRace);
 
-        return $this->render('race/one.html.twig', [
-            'oneRace' => $oneRace,
+        return $this->render('endpoint/one.php', [
+            'oneRace' => $jsonOneRace,
         ]);
     }
 
-    #[Route('/{race}/edit', name: 'edit')] 
-    public function editRace(Race $race) : Response
+    #[Route('/{race}/{race-result}/edit', name: 'edit', methods: ['PUT', 'PATCH'])] 
+    public function editRace(Race $race, RaceResult $raceResult, RaceService $raceService) : Response
     {
-        return $this->render('race/edit.html.twig', [
-            'race' => $race,
+        $editSingleResult = $raceService->editSingle($raceResult);
+        return $this->render('endpoint/edit.php', [
+            'raceResult' => $raceResult,
         ]);
     } 
 }
+

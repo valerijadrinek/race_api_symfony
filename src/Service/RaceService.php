@@ -15,7 +15,7 @@ class RaceService
         return $this->raceRepository->getAllRaces();
     }
 
-    public function getOneRace( Race $race) {
-        return $this->raceRepository->getOneRace();
+    public function getOneRace(Race $race) {
+        return $this->raceRepository->getOneRace($race);
     }
 }

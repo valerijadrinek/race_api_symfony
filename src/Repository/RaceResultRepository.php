@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\RaceResult;
+use App\Service\CsvConverter;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query;
@@ -24,18 +25,33 @@ class RaceResultRepository extends ServiceEntityRepository
         parent::__construct($registry, RaceResult::class);
     }
 
-    public function add(array $entityArray, bool $flush=false)
+    public function add($file, CsvConverter $csvConverter)
     {
+        $em = $this->getEntityManager();
+        $em->getConnection()->getConfiguration()->setMiddlewares([]); // DBAL 3
+
+
+        $validateFile = $csvConverter->csvToDb($file);
+
+        if($validateFile) {
         /**  @var RaceResult $entity */
-        foreach($entityArray as $entity) {
-        $this->getEntityManager()->persist($entity);
+        $batchSize = 15;
+        for ($i = 1; $i <= 10000; ++$i) {
+            $raceResult = new RaceResult;
+            $raceResult->setFullName($i);
+            $raceResult->setDistance($i);
+            $raceResult->setTime($i);
+            $raceResult->setAgeCategory($i);
+            $em->persist($raceResult);
+            if (($i % $batchSize) === 0) {
+                $em->flush();
+                $em->clear(); // Detaches all objects from Doctrine!
+            }
         }
+        $em->flush(); // Persist objects that did not make up an entire batch
+        $em->clear();
 
-        if($flush) 
-        {
-            $this->getEntityManager()->flush();
-        }
-
+    }
        
     }
 
@@ -49,7 +65,18 @@ class RaceResultRepository extends ServiceEntityRepository
         }
     }
 
+    public function deleteBulk(RaceResult $raceResult) : void
+    {
+        $em = $this->getEntityManager();
+        // $q = $em->createQuery('delete from MyProject\Model\Manager m where m.salary > 100000');
+        // $numDeleted = $q->execute();
+    }
 
+    public function updateBulk(RaceResult $raceResult) : void
+    {
+        // $q = $em->createQuery('update MyProject\Model\Manager m set m.salary = m.salary * 0.9');
+        // $numUpdated = $q->execute();
+    }
 
 
 //    /**
@@ -58,10 +85,10 @@ class RaceResultRepository extends ServiceEntityRepository
    public function findByExampleField($value): array
    {
        return $this->createQueryBuilder('r')
-           ->andWhere('r.exampleField = :val')
+           ->andWhere('r.distance = :val')
            ->setParameter('val', $value)
            ->orderBy('r.id', 'ASC')
-           ->setMaxResults(10)
+           ->setMaxResults(20)
            ->getQuery()
            ->getResult()
        ;
@@ -70,7 +97,7 @@ class RaceResultRepository extends ServiceEntityRepository
    public function findOneBySomeField($value): ?RaceResult
    {
        return $this->createQueryBuilder('r')
-           ->andWhere('r.exampleField = :val')
+           ->andWhere('r.distance = :val')
            ->setParameter('val', $value)
            ->getQuery()
            ->getOneOrNullResult()

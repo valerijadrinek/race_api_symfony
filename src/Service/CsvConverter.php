@@ -2,10 +2,51 @@
 
 namespace App\Service;
 
-use UnexpactedValueException;
+
 class CsvConverter 
 {
     public function csvToAssociativeArray($file, $delimiter = ',', $enclosure = '"') : ?array 
+    {
+        $validation = $this->validateCsvFile($file);
+        //validation 
+        if ($validation === true){
+        //creating an associate array
+        if (($handle = fopen($file, "r")) !== false) {
+            $headers = fgetcsv($handle, 0, $delimiter, $enclosure);
+            $lines = [];
+            while (($data = fgetcsv($handle, 0, $delimiter, $enclosure)) !== false) {
+                $current = [];
+                $i = 0;
+                foreach ($headers as $header) {
+                    $current[$header] = $data[$i++];
+                }
+                $lines[] = $current;
+            }
+            fclose($handle);
+            return $lines;
+        } 
+    } 
+}
+
+    public function csvToDb($file)
+    {
+        $validation = $this->validateCsvFile($file);
+
+        if($validation === true) {
+        // Open uploaded CSV file with read-only mode
+        $csvFile = fopen($_FILES['file']['tmp_name'], 'r');
+
+        // Skip the first line
+        fgetcsv($csvFile);
+        //return clean file to upload
+        return $csvFile;
+        }
+
+
+
+    }
+
+    private function validateCsvFile($file) : bool 
     {
         $fileMimes = array(
             'text/x-comma-separated-values',
@@ -22,23 +63,12 @@ class CsvConverter
         );
 
         //validation 
-        if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'], $fileMimes)){
-        if (($handle = fopen($file, "r")) !== false) {
-            $headers = fgetcsv($handle, 0, $delimiter, $enclosure);
-            $lines = [];
-            while (($data = fgetcsv($handle, 0, $delimiter, $enclosure)) !== false) {
-                $current = [];
-                $i = 0;
-                foreach ($headers as $header) {
-                    $current[$header] = $data[$i++];
-                }
-                $lines[] = $current;
-            }
-            fclose($handle);
-            return $lines;
-        } 
-    } else {
-        throw new UnexpactedValueException('Only csv files are allowed');
-    }
-}
+        if (!empty($_FILES['file']['name']) && in_array($_FILES['file']['type'], $fileMimes))
+        {
+            return true;
+        } else {
+            return false;
+        }
+
+   }
 }

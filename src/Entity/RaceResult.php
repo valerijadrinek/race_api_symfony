@@ -3,13 +3,62 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\RaceResultRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
+
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+
+
 
 #[ORM\Entity(repositoryClass: RaceResultRepository::class)]
-#[ApiResource]
+#[ApiResource (shortName: 'Racers', 
+               description: 'Racers that are running the race',
+               operations: [
+                new Get(
+                    normalizationContext: [
+                        'groups' => ['racers:read', 'racers:item:get'],
+                    ]),
+                new Put(),
+                new Patch(),
+                new Post(),
+                new GetCollection()
+            ],
+               normalizationContext: [
+                'groups' => ['racers:read'],
+               ],
+               denormalizationContext: [
+                'groups' => ['racers:write'],
+            ]
+        
+        ),
+           ] 
+#[ApiResource(
+    uriTemplate: '/race/{id}/race-results.{_format}', 
+    shortName: 'Racers',
+    operations: [new GetCollection()],
+    uriVariables: [
+        'id' => new Link(
+            fromClass: Race::class,
+            fromProperty: 'racers'
+        )
+    ], 
+   
+    normalizationContext: [
+        'groups' => ['racers:read'],
+       ]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['fullName' => 'partial', 'distance' => 'exact', 'ageCategory' => 'start' ])]
+#[ApiFilter(OrderFilter::class, properties: ['fullName'=>'ASC', 'time'=>'DESC', 'distance'=>'ASC', 'ageCategory'=>'ASC' ], arguments: ['orderParameterName' => 'ord'])] //overall place & age category place
 class RaceResult
 {
     #[ORM\Id]
@@ -20,29 +69,37 @@ class RaceResult
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(['racers:read', 'racers:write', 'race:read', 'race:write'])]
     private ?string $fullName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Choice(['medium', 'long'], message:'Only medium or long distance is valid.')]
+    #[Groups(['racers:read', 'racers:write','race:read', 'race:write'])]
     private ?string $distance = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(['racers:read', 'racers:write','race:read', 'race:write'])]
     private ?int $time = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Groups(['racers:read', 'racers:write','race:read', 'race:write'])]
     private ?string $ageCategory = null;
 
     #[ORM\ManyToOne(inversedBy: 'racers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\Valid]
+    #[Groups(['racers:read', 'racers:write'])]
     private ?Race $race = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['racers:read'])]
     private ?int $overall_placement = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['racers:read'])]
     private ?int $age_category_placement = null;
 
     public function getId(): ?int
@@ -144,4 +201,7 @@ class RaceResult
 
         return $this;
     }
+
+
+   
 }
