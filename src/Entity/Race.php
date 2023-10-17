@@ -5,8 +5,6 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\GetCollection;
 
 use App\Repository\RaceRepository;
@@ -30,18 +28,18 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 #[ApiResource(shortName: 'Race', description: 'A representation of race and racers collection',
                 operations: [
                     new Get(),
-                    new Put(),
-                    new Patch(),
-                    new Post()
+                    new Post(),
+                    new GetCollection()
                 ],
                 normalizationContext: [
                         'groups' => ['race:read'],
                     ],
                 denormalizationContext: [
                         'groups' => ['race:write'],
-])]
+                ],
+                )]
 ##[Get(output: RaceRepresentation::class, provider: RaceRepresentationProvider::class)]//-POPRAVITI klasu
-#[GetCollection(output: RaceCollectionRepresentation::class, provider: RaceCollectionProvider::class)]// isto
+##[GetCollection(output: RaceCollectionRepresentation::class, provider: RaceCollectionProvider::class)]// isto
 #[ApiFilter(OrderFilter::class, properties: ['title'=>'ASC', 'date'=>'DESC'], arguments: ['orderParameterName' => 'ord'])]//avg finish times
 
 
@@ -54,7 +52,7 @@ class Race
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(['race:read', 'race:write', 'racers:item:get'])]
+    #[Groups(['race:read', 'race:write', ])]
     #[ApiFilter(SearchFilter::class, strategy:'partial')]
     private ?string $title = null;
 
@@ -65,7 +63,7 @@ class Race
 
     #[ORM\OneToMany(mappedBy: 'race', targetEntity: RaceResult::class, cascade: ['persist'], orphanRemoval: true)]
     #[Assert\Valid]
-    #[Groups(['race:read', 'race:write', 'racers:read'])]
+    #[Groups(['race:read', 'race:write'])]
     private Collection $racers;
 
     public function __construct()

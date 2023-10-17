@@ -2,61 +2,99 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Patch;
-use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
-use App\Repository\RaceResultRepository;
+use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Patch;
+use App\State\PlacementStateProcessor;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Serializer\Annotation\Groups;
-
 use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\Repository\RaceResultRepository;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 
 
 #[ORM\Entity(repositoryClass: RaceResultRepository::class)]
 #[ApiResource (shortName: 'Racers', 
-               description: 'Racers that are running the race',
+               description: 'Racers that are running the {id} race',
                operations: [
                 new Get(
                     normalizationContext: [
-                        'groups' => ['racers:read', 'racers:item:get'],
+                        'groups' => ['racers:read' ],
                     ]),
-                new Put(),
-                new Patch(),
-                new Post(),
-                new GetCollection()
+                new Post(
+                    processor: PlacementStateProcessor::class,
+                ),
+                new GetCollection(normalizationContext: [
+                    'groups' => ['racers:read' ]
+                ])
+             
             ],
+         
                normalizationContext: [
                 'groups' => ['racers:read'],
                ],
                denormalizationContext: [
                 'groups' => ['racers:write'],
-            ]
+               ]
         
         ),
-           ] 
+    ] 
 #[ApiResource(
-    uriTemplate: '/race/{id}/race-results.{_format}', 
+    uriTemplate: '/race/{race_id}/racers',
     shortName: 'Racers',
     operations: [new GetCollection()],
     uriVariables: [
-        'id' => new Link(
+        'race_id' => new Link(
+            fromProperty: 'racers',
             fromClass: Race::class,
-            fromProperty: 'racers'
-        )
-    ], 
-   
-    normalizationContext: [
-        'groups' => ['racers:read'],
-       ]
+        ),
+    ],
 )]
+
+#[ApiResource(
+    uriTemplate: '/race/{race_id}/racers/{id}',
+    shortName: 'Racers',
+    uriVariables: [
+        'race_id' => new Link(
+            fromProperty: 'racers',
+            fromClass: Race::class,
+        ),
+        'id' => new Link(
+            fromClass: RaceResult::class,
+        )            
+        
+            
+    ],
+    operations: [
+        new Get(
+            normalizationContext: [
+                'groups' => [ 'racers:read'],
+               ],
+        ),
+        
+            new Patch(
+                normalizationContext: [
+                    'groups' => [ 'race:read'],
+                   ],
+                denormalizationContext: [
+                    'groups' => ['racers:write']
+                ]
+            )],
+    
+)]
+
+
+   
+
 #[ApiFilter(SearchFilter::class, properties: ['fullName' => 'partial', 'distance' => 'exact', 'ageCategory' => 'start' ])]
 #[ApiFilter(OrderFilter::class, properties: ['fullName'=>'ASC', 'time'=>'DESC', 'distance'=>'ASC', 'ageCategory'=>'ASC' ], arguments: ['orderParameterName' => 'ord'])] //overall place & age category place
 class RaceResult
@@ -64,42 +102,50 @@ class RaceResult
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    
+    #[Groups('racers:read', 'race:read')]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(['racers:read', 'racers:write', 'race:read', 'race:write'])]
+    #[Groups(['racers:read', 'racers:write', 'race:read'])]
     private ?string $fullName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Assert\Choice(['medium', 'long'], message:'Only medium or long distance is valid.')]
-    #[Groups(['racers:read', 'racers:write','race:read', 'race:write'])]
+    #[Groups(['racers:read', 'racers:write','race:read'])]
     private ?string $distance = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(['racers:read', 'racers:write','race:read', 'race:write'])]
+    #[Groups(['racers:read', 'racers:write','race:read'])]
     private ?int $time = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(['racers:read', 'racers:write','race:read', 'race:write'])]
+    #[Groups(['racers:read', 'racers:write','race:read'])]
     private ?string $ageCategory = null;
 
     #[ORM\ManyToOne(inversedBy: 'racers')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\Valid]
-    #[Groups(['racers:read', 'racers:write'])]
+    #[Groups(['racers:read', 'race:write'])]
     private ?Race $race = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['racers:read'])]
+    #[Groups(['racers:read','racers:write', 'race:read'])]
+    #[SerializedName('Overall Placement')]
+    /**
+     * @var int Non-persisted
+     * */
     private ?int $overall_placement = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['racers:read'])]
+    #[Groups(['racers:read','racers:write', 'race:read'])]
+    #[SerializedName('Age Category Placement')]
+    /**
+     * @var int Non-persisted
+     * */
     private ?int $age_category_placement = null;
 
     public function getId(): ?int
