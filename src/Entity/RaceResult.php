@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
@@ -94,9 +93,9 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 
 
    
-
 #[ApiFilter(SearchFilter::class, properties: ['fullName' => 'partial', 'distance' => 'exact', 'ageCategory' => 'start' ])]
-#[ApiFilter(OrderFilter::class, properties: ['fullName'=>'ASC', 'time'=>'DESC', 'distance'=>'ASC', 'ageCategory'=>'ASC' ], arguments: ['orderParameterName' => 'ord'])] //overall place & age category place
+#[ApiFilter(OrderFilter::class, properties: ['fullName', 'finishTime'=>'DESC', 'distance'=>'ASC', 'ageCategory', 'overallPlacement', 'ageCategoryPlace'  ], arguments: ['orderParameterName' => 'ord'])] 
+
 class RaceResult
 {
     #[ORM\Id]

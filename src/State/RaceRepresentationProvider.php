@@ -2,7 +2,7 @@
 
 namespace App\State;
 
-use App\Entity\Race;
+
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Doctrine\Orm\State\ItemProvider;
@@ -25,26 +25,39 @@ final class RaceRepresentationProvider implements ProviderInterface
         if (!$race) {
             return null;
         }
+        
         return $this->mapEntityToDto($race);
     }
 
     private function mapEntityToDto(object $race): object
     {
-        $title = $race->getTitle();
-        $date = $race->getDate();
+        //fetching race result
+        $dto = new RaceRepresentation();
+        $dto->title = $race->title();
+        $dto->date = $race->date(); 
 
-        $racers = $race->getRacers();
+        $racerCollection = $race->racers();
 
-       
-        $averageTimeMedium = $this->avgTime($arrayMedium);
-        $averageTimeLong = $this->avgTime($arrayLong);
-
-        $dto = new RaceRepresentation($title, $date, $averageTimeMedium, $averageTimeLong);
+        //extracting time & distance 
+        $long = [];
+        $medium = [];
+        
+        foreach ( $racerCollection as $racer ) {
+            if ($racer['distance'] == "long") {
+                $long[] = $racer['time'];
+            } else {
+                $medium[] =$racer['time'];
+            }
+        }
+       //calculating avg time duration for all medium and long races
+        $dto->averageTimeLong = $this->avgTime($long);
+        $dto->averageTimeMedium = $this->avgTime($medium);
+        $dto = new RaceRepresentation();
       
         return $dto;
     }
        
-    private function avgTime(array $array)  //moram dobiti array sa vremenima
+    private function avgTime(array $array)  //time interval array
     {
         $seconds = 0;
         foreach($array as $hours) {
@@ -52,39 +65,13 @@ final class RaceRepresentationProvider implements ProviderInterface
         $seconds += $exp[0]*3600 + $exp[1]*60 + $exp[2];
         }
         
-        $averag = $seconds/sizeof( $array);
-        
-        
-        
-       return gmdate("H:i:s", $averag);
+        $averagTime = $seconds/sizeof( $array);
+         
+       return gmdate("H:i:s", $averagTime);
 
     }
 
-    private function getTimetoArray($racers) 
-    {
-        $apps = [
-            ['distance' => 'long', 'time' => 2],
-            ['distance' => 'medium', 'time' => 1],
-            ['distance' => 'long', 'time' => 3],
-            ['distance' => 'medium', 'time' => 7],
-            ['distance' => 'long', 'time' => 9]
-        ];
-        
-        $long = [];
-        $medium = [];
-        
-        foreach ( $apps as $var ) {
-            if ($var['distance'] == "long") {
-                $long[] = $var['time'];
-            } else {
-                $medium[] =$var['time'];
-            }
-        }
-        
-        print_r($long);
-        print_r($medium);
-
-        }
+    
 
     }
     

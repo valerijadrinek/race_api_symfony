@@ -38,9 +38,9 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
                         'groups' => ['race:write'],
                 ],
                 )]
-##[Get(output: RaceRepresentation::class, provider: RaceRepresentationProvider::class)]//-POPRAVITI klasu
-##[GetCollection(output: RaceCollectionRepresentation::class, provider: RaceCollectionProvider::class)]// isto
-#[ApiFilter(OrderFilter::class, properties: ['title'=>'ASC', 'date'=>'DESC'], arguments: ['orderParameterName' => 'ord'])]//avg finish times
+#[Get(output: RaceRepresentation::class, provider: RaceRepresentationProvider::class)]
+#[GetCollection(output: RaceCollectionRepresentation::class, provider: RaceCollectionProvider::class)]
+#[ApiFilter(OrderFilter::class, properties: ['title'=>'ASC'], arguments: ['orderParameterName' => 'ord'])]
 
 
 class Race
