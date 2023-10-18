@@ -1,8 +1,15 @@
 <?php
 namespace App\Dto;
 
-use App\Entity\Race;
 
-class RaceRepresentation extends Race {
 
+class RaceRepresentation  {
+
+    public function __construct(public string $title,
+                                public \DateTimeInterface $date,
+                                public int $averageTimeMedium,
+                                public int $averageTimeLong){
+
+    }
+ 
 }

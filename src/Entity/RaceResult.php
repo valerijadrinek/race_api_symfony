@@ -119,7 +119,7 @@ class RaceResult
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Groups(['racers:read', 'racers:write','race:read'])]
-    private ?int $time = null;
+    private ?string $time = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
@@ -177,13 +177,14 @@ class RaceResult
         return $this;
     }
 
-    public function getTime(): ?int
+    public function getTime(): ?string
     {
         return $this->time;
     }
 
-    public function setTime(int $time): static
+    public function setTime(?string $time): static
     {
+
         $this->time = $time;
 
         return $this;
@@ -247,6 +248,26 @@ class RaceResult
 
         return $this;
     }
+
+
+    private function calculatePlacement($time)
+{
+    
+    $csvTimes = [];
+    $csvTimes[] = $time;
+
+    foreach ($csvTimes as $csvTime) {
+        date_parse_from_format("H:i:s", $csvTime);     
+        
+    }
+
+    
+   
+
+}
+    
+
+    
 
 
    
