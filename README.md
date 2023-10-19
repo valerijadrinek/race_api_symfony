@@ -27,6 +27,7 @@ Output
 
 
 # 💻 Development
-1.  git clone https://github.com/valerijadrinek/quote-generator.git
+1.  git clone https://github.com/valerijadrinek/race_api_symfony/tree/main
+
 
 # race_api_symfony
