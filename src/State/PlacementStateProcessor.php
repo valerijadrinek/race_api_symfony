@@ -27,52 +27,100 @@ class PlacementStateProcessor implements ProcessorInterface
     
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
-     //csv file parsimg
-     $encoder = [new CsvEncoder([CsvEncoder::DELIMITER_KEY => ','])];
-     $normalizer = [new ObjectNormalizer()];
-     $serializer = new Serializer($normalizer, $encoder);
-     $output = $serializer->decode($data,'csv');
+
+        $encodedData = $this->encodingCsv($data);
+        $overallcalculatedArray = $this->calculateOverallPlacement($encodedData);
+        $agecategorycallculatedArray = $this->calculateAgeCategoryPlacement($overallcalculatedArray);
+        
+        
+
+       
+    
+        $this->innerProcessor->process($overallcalculatedArray, $operation, $uriVariables, $context);
      
-
-     //izračunati vrijednosti
-     foreach ($output as $key => $value) {
-      
-     }
-
-
-
-     //ubaciti ih u array
-     //na redu dolazi upload
-     $em = $this->raceResultRepository->getEntityManager();
-     $em->getConnection()->getConfiguration()->setMiddlewares([]); // DBAL 3
-     $batchSize = 20;
-     for ($i = 1; $i <= 10000; ++$i) {
-         $raceResult = new RaceResult;
-         $raceResult->setFullName($i);
-         $raceResult->setDistance($i);
-         $raceResult->setTime($i);
-         $raceResult->setAgeCategory($i);
-         $raceResult->setOverallPlacement($i);
-         $raceResult->setAgeCategoryPlacement($i);
-         $em->persist($raceResult);
-         if (($i % $batchSize) === 0) {
-             $em->flush();
-             $em->clear(); // Detaches all objects from Doctrine!
-         }
-     }
-     $em->flush(); // Persist objects that did not make up an entire batch
-     $em->clear();
+     
+     
     }
 
-      // if ($data === 'long') 
-      //   {
-      //       //$data;
-            
-      //     //calculate placement
-      //   }
+    private function encodingCsv($arrayData):array
+    {
+       //csv file parsimg
+       $encoder = [new CsvEncoder([CsvEncoder::DELIMITER_KEY => ','])];
+       $normalizer = [new ObjectNormalizer(), new ArrayDenormalizer()];
+       $serializer = new Serializer($normalizer, $encoder);
+       $output = $serializer->decode($arrayData,'csv');
+       return $output;
+    } 
 
-      //   $this->innerProcessor->process($data, $operation, $uriVariables, $context);
-              
+   private function calculateOverallPlacement(array $arrayData):array
+   {
+    
+       uasort($arrayData, function($a, $b) {
+           return strtotime($a['time']) - strtotime($b['time']);
+       });
+       //initialiying new array
+       $racerData = array();
+
+        // iterate the field and access the same indexes from the other fields
+        for($i = 1; $i < count($arrayData); $i++) {
+            $racerData = [ 
+                'fullName' => $arrayData[$i]['fullName'],
+                'distance' => $arrayData[$i]['distance'],
+                'time' => $arrayData[$i]['time'],
+                'ageCategory' => $arrayData[$i]['ageCategory'],
+                'overall_placement'=>$i
+            ];
+        }
+        return $racerData;
+    
+   }
+
+   private function calculateAgeCategoryPlacement(array $arrayData):array
+   {
+    $uniquearray = array_unique($arrayData);
+        
+    $racersData = [];
+    
+    //matching values from uniquearray and arrayData
+    foreach($uniquearray as $value) {
+
+        if(in_array($value, $arrayData)) {
+            //combining them to new array
+           $times = [//here goes all the data from matching array
+        ]; 
+           
+            //sorting
+            uasort($times, function($a, $b) {
+                return strtotime($a['time']) - strtotime($b['time']); 
+            });
+            
+        //initialiying new array with age category placements
+            $racerData = [];
+    
+            // iterate the field and access the same indexes from the other fields
+            for($i = 1; $i < count($arrayData); $i++) {
+                $racerData =[ 
+                    'fullName' => $arrayData[$i]['fullName'],
+                    'distance' => $arrayData[$i]['distance'],
+                    'time' => $arrayData[$i]['time'],
+                    'ageCategory' => $arrayData[$i]['ageCategory'],
+                    'overall_placement'=>$arrayData['overall_placement'],
+                    'age_category_placement' =>$i
+                ];
+            }
+
+        
+         }
+
+         return $racerData;
+        };
+       
+    }
+
+   
+
+
+  
         
 }
 

@@ -24,31 +24,30 @@ class RaceResultRepository extends ServiceEntityRepository
         parent::__construct($registry, RaceResult::class);
     }
 
-    public function add( array $array)
+    public function add( array $arrayData)
     {
         $em = $this->getEntityManager();
         $em->getConnection()->getConfiguration()->setMiddlewares([]); // DBAL 3
+     
+     $batchSize = 20;
+     for ($i = 1; $i <= 10000; ++$i) {
+         $line = $arrayData[$i];
+         $raceResult = new RaceResult();
+         $raceResult->setFullName($line[0]);
+         $raceResult->setDistance($line[1]);
+         $raceResult->setTime($line[2]);
+         $raceResult->setAgeCategory($line[3]);
+         $raceResult->setOverallPlacement($line[4]);
+         $raceResult->setAgeCategoryPlacement($line[5]);
+         $em->persist($raceResult);
+         if (($i % $batchSize) === 0) {
+             $em->flush();
+             $em->clear(); // Detaches all objects from Doctrine!
+         }
+     }
+     $em->flush(); // Persist objects that did not make up an entire batch
+     $em->clear();
 
-
-    
-
-        // if($array) {
-        // /**  @var RaceResult $entity */
-        // $batchSize = 15;
-        // for ($i = 1; $i <= 10000; ++$i) {
-        //     $raceResult = new RaceResult;
-        //     $raceResult->setFullName($i);
-        //     $raceResult->setDistance($i);
-        //     $raceResult->setTime($i);
-        //     $raceResult->setAgeCategory($i);
-        //     $em->persist($raceResult);
-        //     if (($i % $batchSize) === 0) {
-        //         $em->flush();
-        //         $em->clear(); // Detaches all objects from Doctrine!
-        //     }
-        // }
-        // $em->flush(); // Persist objects that did not make up an entire batch
-        // $em->clear();
 
     }
        
