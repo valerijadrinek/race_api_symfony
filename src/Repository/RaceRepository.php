@@ -42,7 +42,7 @@ class RaceRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
+  //some new methods
     public function getAllRaces():array
     {
         return $this->findAllQuery(

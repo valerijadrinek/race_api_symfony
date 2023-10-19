@@ -9,7 +9,7 @@ use Zenstruck\Foundry\Test\ResetDatabase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 
-class TestRaceResultResultTest extends KernelTestCase
+class TestRaceResultTest extends KernelTestCase
 {
     use HasBrowser;
     use ResetDatabase;

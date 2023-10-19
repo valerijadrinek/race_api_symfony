@@ -2,13 +2,13 @@
 namespace App\Dto;
 
 use ApiPlatform\Metadata\ApiFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use App\Filter\SearchDtoFilter;
+use App\Filter\OrderDtoFilter;
 
 
-#[ApiFilter(SearchFilter::class, strategy:'partial')]
-#[ApiFilter(OrderFilter::class, properties: ['title'=>'ASC', 'date' => 'DESC', 'averageTimeMedium' => 'DESC', 'averageTimeLong' => 'DESC'], arguments: ['orderParameterName' => 'ord'])]
-final class RaceRepresentation  {
+#[ApiFilter(SearchDtoFilter::class, properties: ['title'] )]
+#[ApiFilter(OrderDtoFilter::class, properties: ['title', 'date' => 'DESC', 'averageTimeMedium' => 'DESC', 'averageTimeLong' => 'DESC'], arguments: ['orderParameterName' => 'ord'])]
+class RaceRepresentation  {
     
     public ?string $title = null;
     public ?string $date = null;
