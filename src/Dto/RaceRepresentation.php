@@ -7,7 +7,7 @@ use App\Filter\OrderDtoFilter;
 
 
 #[ApiFilter(SearchDtoFilter::class, properties: ['title'] )]
-#[ApiFilter(OrderDtoFilter::class, properties: ['title', 'date' => 'DESC', 'averageTimeMedium' => 'DESC', 'averageTimeLong' => 'DESC'], arguments: ['orderParameterName' => 'ord'])]
+#[ApiFilter(OrderDtoFilter::class, properties: ['title'=>'ASC', 'date' => 'DESC', 'averageTimeMedium' => 'DESC', 'averageTimeLong' => 'DESC'])]
 class RaceRepresentation  {
     
     public ?string $title = null;

@@ -20,7 +20,7 @@ final class SearchDtoFilter extends AbstractFilter
 
         $parameterName = $queryNameGenerator->generateParameterName($property); // Generate a unique parameter name to avoid collisions with other filters
         $queryBuilder
-        ->andWhere(sprintf('REGEXP(o.%s, :%s) = 1', $property, $parameterName))
+        ->andWhere(sprintf('o.%s LIKE :%s', $property, $parameterName))
         ->setParameter($parameterName, $value);
     }
            
@@ -37,9 +37,9 @@ final class SearchDtoFilter extends AbstractFilter
                 'property' => $property,
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'description' => 'Filter using a regex. This will appear in the OpenApi documentation!',
+                'description' => 'Filter used to search proprerty of Dto class.',
                 'openapi' => [
-                    'example' => 'Custom example that will be in the documentation and be the default value of the sandbox',
+                    'example' => '',
                     'allowReserved' => false,// if true, query parameters will be not percent-encoded
                     'allowEmptyValue' => true,
                     'explode' => false, // to be true, the type must be Type::BUILTIN_TYPE_ARRAY, ?product=blue,green will be ?product=blue&product=green
