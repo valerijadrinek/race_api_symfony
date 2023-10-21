@@ -20,7 +20,7 @@ final class SearchDtoFilter extends AbstractFilter
 
         $parameterName = $queryNameGenerator->generateParameterName($property); // Generate a unique parameter name to avoid collisions with other filters
         $queryBuilder
-        ->andWhere(sprintf('o.%s LIKE :%s', $property, $parameterName))
+        ->andWhere(sprintf('o.%s LIKE %%:%s', $property, $parameterName))
         ->setParameter($parameterName, $value);
     }
            

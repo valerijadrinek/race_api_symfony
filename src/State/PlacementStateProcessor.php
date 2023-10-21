@@ -76,49 +76,48 @@ class PlacementStateProcessor implements ProcessorInterface
    }
 
    private function calculateAgeCategoryPlacement(array $arrayData):array
-   {
-    $uniquearray = array_unique($arrayData);
-        
-    $racersData = [];
-    
-    //matching values from uniquearray and arrayData
-    foreach($uniquearray as $value) {
+   {    
 
-        if(in_array($value, $arrayData)) {
-            //combining them to new array
-           $times = [//here goes all the data from matching array
-        ]; 
-           
-            //sorting
-            uasort($times, function($a, $b) {
-                return strtotime($a['time']) - strtotime($b['time']); 
-            });
-            
-        //initialiying new array with age category placements
-            $racerData = [];
-    
-            // iterate the field and access the same indexes from the other fields
-            for($i = 1; $i < count($arrayData); $i++) {
-                $racerData =[ 
-                    'fullName' => $arrayData[$i]['fullName'],
-                    'distance' => $arrayData[$i]['distance'],
-                    'time' => $arrayData[$i]['time'],
-                    'ageCategory' => $arrayData[$i]['ageCategory'],
-                    'overall_placement'=>$arrayData['overall_placement'],
-                    'age_category_placement' =>$i
-                ];
+        $racerData = [];
+        //array unique for ageCategoey field
+        $unique = array_unique(array_column($arrayData, 'ageCategory'));
+
+
+        //sorting arrays by time and field
+        uasort($arrayData, function($a, $b) {
+                         return strtotime($a['time']) - strtotime($b['time']); });
+                   
+        usort($arrayData, function($x, $y) {
+            return strcasecmp($x['ageCategory'] , $y['ageCategory']);
+         });
+
+         //counting repetitive values as key(value from ageCategory column), value(number of repetitions)
+        $countDataValues = array_count_values(array_column($arrayData, 'ageCategory'));
+
+        //trying to solve a_g_placement
+        foreach ($countDataValues as $key => $value) {
+            foreach($arrayData as $data){
+ //$i=1; while($key == $data['ageCategory'])-while is not working here - $data['age_category_placement'] = $i; $i++; 
+                if($key == $data['ageCategory']) {
+                    for($i = 1; $i < $value; $i++) {
+                        $racerData =[ 
+                            'fullName' => $arrayData[$i]['fullName'],
+                            'distance' => $arrayData[$i]['distance'],
+                            'time' => $arrayData[$i]['time'],
+                            'ageCategory' => $arrayData[$i]['ageCategory'],
+                            'overall_placement'=>$arrayData['overall_placement'],
+                            'age_category_placement' =>$i
+                        ];
+                    }
+                }        
+                
             }
+           
+        }
+        return $racerData;
+   }
 
-        
-         }
-
-         return $racerData;
-        };
-       
-    }
-
-   
-
+         
 
   
         
