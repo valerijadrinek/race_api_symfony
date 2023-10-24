@@ -2,16 +2,13 @@
 
 namespace App\State;
 
-use App\Entity\RaceResult;
+
 use ApiPlatform\Metadata\Operation;
 use App\Repository\RaceResultRepository;
 use ApiPlatform\State\ProcessorInterface;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+
 
 
 class PlacementStateProcessor implements ProcessorInterface
@@ -28,8 +25,8 @@ class PlacementStateProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
 
-        $encodedData = $this->encodingCsv($data);
-        $overallcalculatedArray = $this->calculateOverallPlacement($encodedData);
+        
+        $overallcalculatedArray = $this->calculateOverallPlacement($data);
         $agecategorycallculatedArray = $this->calculateAgeCategoryPlacement($overallcalculatedArray);
         
         
@@ -42,15 +39,7 @@ class PlacementStateProcessor implements ProcessorInterface
      
     }
 
-    private function encodingCsv($arrayData):array
-    {
-       //csv file parsimg
-       $encoder = [new CsvEncoder([CsvEncoder::DELIMITER_KEY => ','])];
-       $normalizer = [new ObjectNormalizer(), new ArrayDenormalizer()];
-       $serializer = new Serializer($normalizer, $encoder);
-       $output = $serializer->decode($arrayData,'csv');
-       return $output;
-    } 
+   
 
    private function calculateOverallPlacement(array $arrayData):array
    {

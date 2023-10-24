@@ -8,3 +8,12 @@ api_platform:
             vary: ['Content-Type', 'Authorization', 'Origin']
         extra_properties:
             standard_put: true
+    formats:
+        jsonld:   ['application/ld+json']
+        jsonhal:  ['application/hal+json']
+        jsonapi:  ['application/vnd.api+json']
+        json:     ['application/json']
+        csv:      ['text/csv']
+    patch_formats:
+        json:     ['application/merge-patch+json']
+        jsonapi:  ['application/vnd.api+json']

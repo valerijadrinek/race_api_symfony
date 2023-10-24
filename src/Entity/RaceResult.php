@@ -80,7 +80,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
                ],
         ),
         
-            new Patch(
+            new Patch(inputFormats: ['json' => ['application/merge-patch+json']],
                 normalizationContext: [
                     'groups' => [ 'race:read'],
                    ],

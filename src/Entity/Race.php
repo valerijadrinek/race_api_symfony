@@ -14,9 +14,11 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Metadata\ApiProperty;
+use Symfony\Component\HttpFoundation\File\File;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 use App\Dto\RaceRepresentation;
-use App\Dto\RaceCollectionRepresentation;
 use App\State\RaceRepresentationProvider;
 
 use ApiPlatform\Metadata\ApiFilter;
@@ -39,7 +41,6 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
                 ],
                 )]
 #[Get(output: RaceRepresentation::class, provider: RaceRepresentationProvider::class)]
-#[GetCollection(output: RaceCollectionRepresentation::class, provider: RaceCollectionProvider::class)]
 #[ApiFilter(OrderFilter::class, properties: ['title'=>'ASC'], arguments: ['orderParameterName' => 'ord'])]
 
 
@@ -65,6 +66,11 @@ class Race
     #[Assert\Valid]
     #[Groups(['race:read', 'race:write'])]
     private Collection $racers;
+
+    #[ORM\OneToOne(targetEntity: MediaObject::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[ApiProperty(types: ['https://schema.org/csvfile'])]
+    public ?MediaObject $csvfile = null;
 
     public function __construct()
     {
